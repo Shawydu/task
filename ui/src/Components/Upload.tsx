@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import axios from 'axios';
+import './Upload.css'
 
 type Props = {
   handleUploadState: Function
@@ -45,10 +46,8 @@ class UploadButton extends Component<Props, UploadButtonState> {
       this.props.handleUploadState(true);
     }).catch(err => {
       this.setState({
-        message: err.message
+        message: err.response.data.detail
       });
-
-      this.props.handleUploadState(true);
     })
   };
 

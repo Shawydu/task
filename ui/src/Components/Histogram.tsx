@@ -9,6 +9,7 @@ type MyProps = {
 
 type MyState = {
     data: any,
+    readyState: boolean,
 }
 
 interface CalculateData {
@@ -22,12 +23,13 @@ class Histogram extends Component<MyProps, MyState> {
         super(props);
 
         this.state = {
-            data: null
+            data: null,
+            readyState: false,
         }
     }
 
     retrieveData = () => {
-        if(!this.props.startLoading) {
+        if(this.state.readyState || !this.props.startLoading) {
             return;
         }
 
@@ -41,6 +43,9 @@ class Histogram extends Component<MyProps, MyState> {
             });
 
             this.props.handleUploadState(false);
+            this.setState({
+                readyState: true
+            })
         }
     }
 
