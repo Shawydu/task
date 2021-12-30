@@ -1,7 +1,5 @@
-from fastapi import APIRouter, status, UploadFile, File, BackgroundTasks
-from fastapi.param_functions import Header
+from fastapi import APIRouter, status, UploadFile, File, BackgroundTasks, WebSocket
 import pandas as pd
-import json
 from app.definitions import TASK1_DIR, TASK2_DIR
 
 router = APIRouter(
@@ -14,18 +12,27 @@ router = APIRouter(
 
 @router.post("/tasks/uploaddata", status_code=status.HTTP_202_ACCEPTED)
 async def upload_data(file: UploadFile = File(...), background_tasks: BackgroundTasks = None):
-# def upload_data(file: UploadFile):
 
     background_tasks.add_task(process_data, file)
-    # process_data(file)
-    print("I'm going first")
-    return {"message": "File {} upload successfully".format(file.name)}
 
-@router.get("/tasks/status", status_code=status.HTTP_200_OK)
-def check_status():
-    task1 = pd.read_csv(TASK1_DIR).to_dict('records')
-    task2 = pd.read_csv(TASK2_DIR).to_dict('records')
-    return {'task1': task1, 'task2': task2}
+    return {"message": "File {} upload successfully"}
+
+@router.websocket("/tasks/{task_id}")
+async def tasks_ws_endpoint(websocket: WebSocket, task_id: str):
+    await websocket.accept()
+    while True:
+        try:
+            task = {}
+            match task_id:
+                case '1':
+                    task = pd.read_csv(TASK1_DIR).to_dict('split')
+                case '2':
+                    task = pd.read_csv(TASK2_DIR).to_dict('split')
+            
+            await websocket.send_json(data=task)
+            break
+        except FileNotFoundError as ex:
+            continue
 
 def process_data(file: UploadFile):
     df = pd.read_csv(file.file)
@@ -39,7 +46,6 @@ def process_data(file: UploadFile):
 
     processed_task1.to_csv(TASK1_DIR)
     processed_task2.to_csv(TASK2_DIR)
-    print("I'm going second")
 
 def compute_mean(x):
     result = {"hpw_mean": x["hours-per-week"].mean()}

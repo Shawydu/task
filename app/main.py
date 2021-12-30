@@ -1,10 +1,20 @@
 from fastapi import FastAPI
-from app.database import db_helper
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers import tasks
 
 app = FastAPI()
 
+origins = [
+    "http://localhost:3000",
+    "http://localhost:8080"
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(tasks.router)
 
