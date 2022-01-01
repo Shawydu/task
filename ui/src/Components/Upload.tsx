@@ -22,7 +22,6 @@ class UploadButton extends Component<Props, UploadButtonState> {
   };
 
   onFileChange = (event: any) => {
-    console.log(event.target.files[0]);
     this.setState({
       uploadFile: event.target.files[0]
     })
@@ -37,7 +36,8 @@ class UploadButton extends Component<Props, UploadButtonState> {
     }
     const data = new FormData();
     data.append('file', this.state.uploadFile);
-    axios.post('http://localhost:8000/tasks/uploaddata', data, {
+
+    axios.post(`http://${process.env.REACT_APP_SERVER_HOST}/tasks/uploaddata`, data, {
     }).then(resp => {
       this.setState({
         message: resp.data.message

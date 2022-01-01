@@ -33,7 +33,7 @@ class Histogram extends Component<MyProps, MyState> {
             return;
         }
 
-        const ws = new WebSocket("ws://localhost:8000/tasks/" + this.props.name);
+        const ws = new WebSocket(`ws://${process.env.REACT_APP_SERVER_HOST}/tasks/` + this.props.name);
         ws.onmessage = (event) => {
             const resp: CalculateData = JSON.parse(event.data);
             let expected_data = new Array(resp.columns);
