@@ -37,7 +37,7 @@ class UploadButton extends Component<Props, UploadButtonState> {
     const data = new FormData();
     data.append('file', this.state.uploadFile);
 
-    axios.post(`http://${process.env.REACT_APP_SERVER_HOST}/tasks/uploaddata`, data, {
+    axios.post(`http://${process.env.REACT_APP_SERVER_HOST}${process.env.REACT_APP_API_V1}/${process.env.REACT_APP_UPLOAD_ENDPOINT}`, data, {
     }).then(resp => {
       this.setState({
         message: resp.data.message
