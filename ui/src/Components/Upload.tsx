@@ -46,7 +46,7 @@ class UploadButton extends Component<Props, UploadButtonState> {
       this.props.handleUploadState(true);
     }).catch(err => {
       this.setState({
-        message: err.response.data.detail
+        message: err.response.data.message
       });
     })
   };

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, status, UploadFile, File, WebSocket, BackgroundTasks
-from fastapi.exceptions import HTTPException
+from starlette.responses import JSONResponse
 from .service import TaskService
+from .schema import TaskSchema
 from app.utils.app_exceptions import AppException
 
 router = APIRouter(
@@ -19,24 +20,24 @@ async def upload_data(file: UploadFile = File(...), background_tasks: Background
     import data and defer calculation asynchronously
     """
     try:
-        result = await TaskService().handle_data_upload(file, background_tasks)
+        result = TaskService().handle_data_upload(file, background_tasks)
     except AppException as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.message)
-    return result
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"message": e.message})
+    return {"message": result}
 
 @router.websocket(
-    "/{task_id}"
+    "/{task_id}",
 )
-async def tasks_ws_endpoint(websocket: WebSocket, task_id: str):
+async def get_task(websocket: WebSocket, task_id: str) -> TaskSchema:
     """
     open websocket session retrieve calculated data
     """
     await websocket.accept()
     while True:
         try:
-            task = await TaskService().retrieve_data(task_id)
-            await websocket.send_json(data=task)
-            break
-        except FileNotFoundError:
+            await websocket.receive_text()
+            task = TaskService().retrieve_data(task_id)
+            await websocket.send_json(data=task.dict())
+        except AppException as e:
+            await websocket.send_json(data={"message": e.message})
             continue
-
