@@ -14,8 +14,10 @@ class TaskService:
             df = pd.read_csv(file.file)
             if not set(expected_columns).issubset(df.columns):
                 raise AppException(f"expected columns not found: {expected_columns}")
+            # add data processing task to the background tasks list, so that processing handled asynchronously 
             background_tasks.add_task(self.__process_data, df)
         except (ParserError, AppException) as e:
+        # defer validation message to controller, by raising a custom exception
             message = f"Invalid file {file.filename}, {e}"
             raise AppException(message)
         else:

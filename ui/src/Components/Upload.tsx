@@ -11,7 +11,7 @@ type UploadButtonState = {
   message : string
 }
 
-class UploadButton extends Component<Props, UploadButtonState> {
+class FileUpload extends Component<Props, UploadButtonState> {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -19,7 +19,7 @@ class UploadButton extends Component<Props, UploadButtonState> {
       message: ''
     };
 
-  };
+  }
 
   onFileChange = (event: any) => {
     this.setState({
@@ -66,7 +66,7 @@ class UploadButton extends Component<Props, UploadButtonState> {
         }
       </div>
     )
-  };
+  }
 }
 
-export default UploadButton;
+export default FileUpload;

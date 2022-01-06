@@ -10,13 +10,6 @@ type MyProps = {
 
 type MyState = {
     data: any,
-    // ws: WebSocket | null,
-}
-
-interface CalculateData {
-    columns: Array<string>,
-    data: Array<any>,
-    index: Array<number>,
 }
 
 class Histogram extends Component<MyProps, MyState> {
@@ -37,22 +30,7 @@ class Histogram extends Component<MyProps, MyState> {
             () => this.retrieveData(),
             2000
         );
-    }
 
-    // close web socket connection on component unmount
-    componentWillUnmount() {
-        if(this.ws != null) {
-            this.ws.close();
-        }
-
-    }
-
-    retrieveData = () => {
-        if(!this.props.startLoading || this.ws == null) {
-            return;
-        }
-
-        this.ws.send("hello!");
         this.ws.onmessage = (event) => {
             const resp: CalculateData = JSON.parse(event.data);
             let expected_data = new Array(resp.columns);
@@ -63,6 +41,29 @@ class Histogram extends Component<MyProps, MyState> {
 
             this.props.handleUploadState(false, this.props.name);
         }
+
+        this.ws.onerror = (event) => {
+            console.log(`An error over web socket, ${event.type}`);
+            this.setState({
+                data: null
+            });
+        }
+    }
+
+    // close web socket connection on component unmount
+    componentWillUnmount() {
+        if(this.ws != null) {
+            this.ws.close();
+        }
+        clearInterval(this.timerId);
+    }
+
+    retrieveData = () => {
+        if(!this.props.startLoading || this.ws == null) {
+            return;
+        }
+
+        this.ws.send("hello!");
     }
 
     render() {

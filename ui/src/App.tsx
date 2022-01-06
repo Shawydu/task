@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import UploadFiles from './Components/Upload';
+import FileUpload from './Components/Upload';
 import Histogram from 'Components/Histogram';
 
 type State = {
@@ -13,7 +13,7 @@ class App extends React.Component<{}, State> {
     super(props);
     this.state = {
       uploadSuccess: false,
-      inProgress: new Array(2),
+      inProgress: new Array(),
     }
   }
 
@@ -32,11 +32,11 @@ class App extends React.Component<{}, State> {
     } else {
       inProgress = inProgress.filter(e => e !== task);
     }
-    console.log(inProgress.length);
+
     this.setState({
       uploadSuccess: inProgress.length > 0 || state,
       inProgress: inProgress,
-    })
+    });
   }
 
   render() {
@@ -45,7 +45,7 @@ class App extends React.Component<{}, State> {
       <div className="Container">
         <div className="row justify-content-center">
           <div className="col-md-4">
-            <UploadFiles handleUploadState={this.handleUploadState}/>
+            <FileUpload handleUploadState={this.handleUploadState}/>
           </div>
         </div>
         <div className="row">
